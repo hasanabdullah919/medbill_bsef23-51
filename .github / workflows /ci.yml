@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install & build frontend
+        working-directory: ./frontend
+        run: |
+          if [ -f package.json ]; then
+            npm install
+            npm run build --if-present
+          else
+            echo "No frontend yet — skipping"
+          fi
+
+  ai-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install & lint AI service
+        working-directory: ./ai-service
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt --break-system-packages
+            pip install flake8 --break-system-packages
+            flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+          else
+            echo "No AI service code yet — skipping"
+          fi
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder backend check
+        working-directory: ./backend
+        run: |
+          echo "Backend build step — update once Laravel/Django is chosen"
