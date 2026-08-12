@@ -1,0 +1,32 @@
+# --- Frontend (React) ---
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# --- Backend (Laravel) ---
+backend/vendor/
+backend/.env
+backend/storage/*.key
+backend/bootstrap/cache/*
+
+# --- Backend (Django, if used instead) ---
+backend/__pycache__/
+backend/*.pyc
+backend/db.sqlite3
+backend/.env
+
+# --- AI Service (Python/FastAPI) ---
+ai-service/venv/
+ai-service/__pycache__/
+ai-service/*.pyc
+ai-service/.env
+ai-service/*.pkl
+ai-service/*.joblib
+
+# --- General ---
+.env
+.DS_Store
+*.log
+.idea/
+.vscode/
+*.sqlite3
