@@ -1,9 +1,6 @@
 import { PDFParse } from "pdf-parse";
 import { createWorker, OEM } from "tesseract.js";
 import path from "node:path";
-import { createRequire } from "node:module";
-
-const requirePackage = createRequire(import.meta.url);
 export type PdfContent = { text: string; source: "embedded" | "ocr" | "mixed"; pages: number; ocrPages: number; averageConfidence: number | null };
 export async function extractPdfContent(bytes: Buffer, forceOcr = false): Promise<PdfContent> {
   const parser = new PDFParse({ data: new Uint8Array(bytes) });
@@ -18,8 +15,8 @@ export async function extractPdfContent(bytes: Buffer, forceOcr = false): Promis
       let text = page.text.replace(/\u0000/g, "").trim();
       if (forceOcr || text.replace(/[^a-z0-9]/gi, "").length < 40) {
         worker ??= await createWorker("eng", OEM.LSTM_ONLY, {
-          langPath: path.join(path.dirname(requirePackage.resolve("@tesseract.js-data/eng/package.json")), "4.0.0_best_int"),
-          workerPath: requirePackage.resolve("tesseract.js/src/worker-script/node/index.js"),
+          langPath: path.join(process.cwd(), "node_modules/@tesseract.js-data/eng/4.0.0_best_int"),
+          workerPath: path.join(process.cwd(), "node_modules/tesseract.js/src/worker-script/node/index.js"),
           cacheMethod: "none", gzip: true,
         });
         const screenshot = await parser.getScreenshot({ partial: [page.num], desiredWidth: 2400, imageBuffer: true, imageDataUrl: false });

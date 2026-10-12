@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const base = process.env.TEST_BASE_URL;
-assert(base?.startsWith('https://'), 'Set TEST_BASE_URL to the production HTTPS URL');
+assert(base && (/^https:\/\//.test(base) || /^http:\/\/127\.0\.0\.1:\d+$/.test(base)), 'Set TEST_BASE_URL to production HTTPS or a local test server');
 async function call(path, data) {
   const response = await fetch(`${base}${path}`, data === undefined ? undefined : {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data),
