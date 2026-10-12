@@ -53,7 +53,7 @@ export function DocumentWorkspace({ initialDocuments, services, loadError }: Pro
   const [outputFilter, setOutputFilter] = useState<DocumentClassification>("accepted");
   const [resetConfirmation, setResetConfirmation] = useState("");
   const [runMode, setRunMode] = useState<"simple" | "debug">("simple");
-  const [debugSession, setDebugSession] = useState("");
+  const [debugSessions, setDebugSessions] = useState<string[]>([]);
   const [debugStep, setDebugStep] = useState(0);
   const [debugLog, setDebugLog] = useState<Array<{ step: string; title: string; details: unknown }>>([]);
   const [runProgress, setRunProgress] = useState<{ step: string; file: string; current: number; total: number } | null>(null);
@@ -92,7 +92,7 @@ export function DocumentWorkspace({ initialDocuments, services, loadError }: Pro
   }
 
   function resetDebugRun() {
-    setDebugSession("");
+    setDebugSessions([]);
     setDebugStep(0);
     setDebugLog([]);
   }
@@ -168,18 +168,27 @@ export function DocumentWorkspace({ initialDocuments, services, loadError }: Pro
     if (!selectedBatchIds.length || debugStep >= debugSteps.length) return;
     setBusy("debug"); setMessage("");
     try {
-      let sessionId = debugSession;
-      if (!sessionId) {
-        const startResponse = await fetch("/api/debug", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "start", ids: selectedBatchIds }) });
-        const startPayload = await startResponse.json();
-        if (!startResponse.ok) throw new Error(startPayload.error || "Could not start debug mode");
-        sessionId = startPayload.sessionId;
-        setDebugSession(sessionId);
+      let sessionIds = debugSessions;
+      if (!sessionIds.length) {
+        sessionIds = [];
+        for (const id of selectedBatchIds) {
+          const startResponse = await fetch("/api/debug", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "start", ids: [id] }) });
+          const startPayload = await startResponse.json();
+          if (!startResponse.ok) throw new Error(startPayload.error || "Could not start debug mode");
+          sessionIds.push(startPayload.sessionId);
+        }
+        setDebugSessions(sessionIds);
       }
       const step = debugSteps[debugStep].key;
-      const response = await fetch("/api/debug", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId, step }) });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || `${debugSteps[debugStep].label} failed`);
+      const payload: { title: string; details: unknown[]; documents: DocumentRecord[] } = { title: "", details: [], documents: [] };
+      for (const sessionId of sessionIds) {
+        const response = await fetch("/api/debug", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId, step }) });
+        const item = await response.json();
+        if (!response.ok) throw new Error(item.error || `${debugSteps[debugStep].label} failed`);
+        payload.title = item.title;
+        payload.details.push(...item.details);
+        payload.documents.push(...(item.documents || []));
+      }
       setDebugLog((current) => [...current, { step, title: payload.title, details: payload.details }]);
       const nextStep = debugStep + 1;
       setDebugStep(nextStep);

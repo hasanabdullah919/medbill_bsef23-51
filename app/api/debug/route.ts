@@ -7,6 +7,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     if (body.action === "start") {
       if (!Array.isArray(body.ids) || !body.ids.length) return Response.json({ error: "Select at least one input file." }, { status: 400 });
+      if (process.env.VERCEL && body.ids.length > 1) return Response.json({ error: "Debug one file per session. The dashboard automatically creates a session for each selected PDF." }, { status: 400 });
       return Response.json(await startDebugSession(body.ids.map(String)));
     }
     if (!body.sessionId || !["read", "ocr", "validate", "analyze", "route"].includes(body.step)) return Response.json({ error: "Invalid debug step." }, { status: 400 });
