@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Document {
+  id                String   @id @default(uuid()) @db.Uuid
+  name              String
+  storageKey        String   @unique
+  size              Int
+  mimeType          String   @default("application/pdf")
+  status            String   @default("uploaded")
+  task              String?
+  result            String?
+  provider          String?
+  error             String?
+  classification    String   @default("pending")
+  destinationFolder String?
+  validationReasons String[] @default([])
+  processedAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([classification, createdAt])
+}
+
+model DebugSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  data      Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

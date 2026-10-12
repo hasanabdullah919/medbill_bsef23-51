@@ -14,14 +14,14 @@ The report follows all ten sections of the university Agile D1 template: Product
 
 - `documents/PRESENTATION_GUIDE.md` — demonstration order, explanations and viva preparation.
 - `evidence/` — login, dashboard and claim-validation screenshots from the matching D1 prototype.
-- `prototype/` — the exact React/Django D1 source, dependency locks and automated tests. Its README contains installation and demonstration commands.
+- The original React/Django D1 prototype is preserved in Git history at commit `0991162`. The active application now lives at the repository root and uses Next.js, Prisma and Supabase Postgres.
 - `reference/` — original proposal, roadmap and university Agile template. These are reference material, not additional completed reports.
 
 ## D1 scope
 
 This package demonstrates Admin/Biller access, patient and insurance records, claim drafts, server-side claim validation and a database-backed dashboard. The report explicitly identifies CMS-1500 export, payments, denials, reporting, evaluated ML and production deployment as later work for this D1 prototype.
 
-The separate Next.js PDF-routing experiment is outside this submission package. No environment files, API keys, local databases, virtual environments or dependency folders are included.
+These documents record the earlier D1 submission. They are preserved as historical submission artifacts; their original implementation claims are not claims about the current Next.js application. No environment files, API keys, local databases, virtual environments or dependency folders are included.
 
 ## Package provenance
 
