@@ -3,7 +3,16 @@ import { createWorker, OEM } from "tesseract.js";
 import path from "node:path";
 export type PdfContent = { text: string; source: "embedded" | "ocr" | "mixed"; pages: number; ocrPages: number; averageConfidence: number | null };
 export async function extractPdfContent(bytes: Buffer, forceOcr = false): Promise<PdfContent> {
-  const parser = new PDFParse({ data: new Uint8Array(bytes) });
+  const pdfAssets = path.join(process.cwd(), "node_modules/pdfjs-dist");
+  const parser = new PDFParse({
+    data: new Uint8Array(bytes),
+    standardFontDataUrl: `${path.join(pdfAssets, "standard_fonts")}/`,
+    cMapUrl: `${path.join(pdfAssets, "cmaps")}/`,
+    cMapPacked: true,
+    wasmUrl: `${path.join(pdfAssets, "wasm")}/`,
+    useSystemFonts: false,
+    disableFontFace: true,
+  });
   let worker: Awaited<ReturnType<typeof createWorker>> | undefined;
   try {
     const document = await parser.getText();
