@@ -29,10 +29,11 @@ Uploads are capped at 4 MB to fit Vercel's function request limit. Selected batc
 ```bash
 npm run lint
 npm run build
+TEST_BASE_URL=https://your-production-domain.vercel.app node tests/production-smoke.mjs
 PLAYWRIGHT_BASE_URL=https://your-production-domain.vercel.app npm test
 ```
 
-The end-to-end suite uploads synthetic PDFs, verifies selection/routing/downloads, creates backups and tests workspace reset. Reset backs up the existing run, restores every PDF to input and clears output. Run this suite only against a workspace you intend to reset.
+The API smoke suite verifies the deployed database/storage, upload guards, a selected-file run, exact PDF downloads, unchanged unselected files, all durable debug checkpoints and backups without resetting the workspace. The browser end-to-end suite additionally tests workspace reset. Reset backs up the existing run, restores every PDF to input and clears output. Run the browser suite only against a workspace you intend to reset.
 
 `GET /api/health` checks actual PostgreSQL and R2 connectivity. `GET /api/documents` reads persisted metadata. Other endpoints cover upload, selected-batch scan, debug steps, backup, reset and private PDF access.
 
