@@ -42,10 +42,6 @@ function displayClassification(value: DocumentClassification) {
   return value.replace("_", " ");
 }
 
-function safeFileName(name: string) {
-  return name.replace(/\.pdf$/i, "").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "routing-report";
-}
-
 export function DocumentWorkspace({ initialDocuments, services, loadError }: Props) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [selectedId, setSelectedId] = useState("");
@@ -228,11 +224,12 @@ export function DocumentWorkspace({ initialDocuments, services, loadError }: Pro
 
   function downloadReport(document: DocumentRecord) {
     if (!document.result) return;
-    const blob = new Blob([document.result], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
     const anchor = window.document.createElement("a");
-    anchor.href = url; anchor.download = `${safeFileName(document.name)}-routing-report.md`; anchor.click();
-    URL.revokeObjectURL(url);
+    anchor.href = `/api/documents/${document.id}/report`;
+    anchor.download = "";
+    window.document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
   }
 
   return (
