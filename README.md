@@ -1,48 +1,47 @@
 # MedBill
 
-Web-based Medical Billing & Revenue Cycle Management System with AI-based claim verification & validation.
+One Next.js application for the PDF input → extraction/OCR → validation → AI → output workflow.
 
-**Group ID:** BSEF23-51 · Hasan Abdullah (bsef23m552) · Irfan Saleem (bsef23m553) · Supervisor: Mr. Umair Babar
+The frontend uses the App Router and React. All backend endpoints are Next.js Route Handlers running on Node.js. Prisma connects directly to Supabase PostgreSQL; the application uses no Supabase Auth, Storage, client SDK, Data API, Edge Functions or Realtime. PDFs and timestamped backups live in a private Cloudflare R2 bucket.
 
-## Overview
-MedBill keeps the medical billing cycle — patients, insurance, charges (ICD-10/CPT), CMS-1500 claims, payments, and reports — in one system. An AI layer checks each claim for missing codes, wrong amounts, and invalid insurance details before submission, and reviews payments/denials afterward.
+OCR runs inside Node.js using PDF.js/pdf-parse and Tesseract.js with bundled English language data. Text-based pages skip OCR. Gemini is primary, Ollama Cloud is the fallback, and both receive extracted text only. Deterministic claim checks decide the output folder.
 
-## Tech Stack
-- **Frontend:** React, Bootstrap
-- **Backend:** PHP (Laravel) or Python (Django)
-- **Database:** MySQL
-- **AI Service:** Python, scikit-learn, Pandas, FastAPI
-- **Reporting:** DomPDF/jsPDF (CMS-1500 PDF), Chart.js
+## Run
 
-## Project Structure
-```
-medbill/
-├── frontend/        # React app
-├── backend/         # Laravel/Django API
-├── ai-service/      # FastAPI claim verification service
-├── database/        # Schema & migrations
-└── docs/            # SRS, mockups, proposal
-```
-
-## Setup
 ```bash
-git clone <repo-url>
-cd medbill
-
-# Frontend
-cd frontend && npm install && npm start
-
-# Backend (example: Laravel)
-cd backend && composer install && php artisan serve
-
-# AI service
-cd ai-service && pip install -r requirements.txt && uvicorn main:app --reload
+cp .env.example .env.local
+# Fill the server-side PostgreSQL, R2 and optional AI values.
+npm ci
+npm run db:migrate
+npm run dev
 ```
 
-## Development
-- **Methodology:** Agile (Scrum), 2-week sprints
-- **Branches:** `main` (stable) · `develop` (integration) · `feature/<name>`
-- **Workflow:** feature branch → commit → PR → merge to `develop`
+Use Node 24. The app opens at http://localhost:3000. Supabase's transaction pooler is the runtime `DATABASE_URL`; its session pooler is `DIRECT_URL` for migrations. No local-file database or fake cloud-storage fallback is used.
 
-## Roadmap
-See project board on Jira for the current sprint backlog.
+## Deploy to Vercel
+
+Import this repository with the root directory left at the repository root. Choose Next.js and Node 24, copy `.env.example` values into Vercel's server-side environment settings, run Prisma migrations before first use, and deploy. No separate frontend/backend services or Python runtime are required.
+
+Uploads are capped at 4 MB to fit Vercel's function request limit. Selected batches run one file per server request to avoid a single long batch exceeding Vercel's function duration. Debug session data is persisted in PostgreSQL so steps can run across different serverless instances. R2 holds `input/`, `output/accepted/`, `output/needs-review/`, `output/rejected/`, `output/failed/` and `backups/<timestamp>/`.
+
+## Verify
+
+```bash
+npm run lint
+npm run build
+PLAYWRIGHT_BASE_URL=https://your-production-domain.vercel.app npm test
+```
+
+The end-to-end suite uploads synthetic PDFs, verifies selection/routing/downloads, creates backups and tests workspace reset. Reset backs up the existing run, restores every PDF to input and clears output. Run this suite only against a workspace you intend to reset.
+
+`GET /api/health` checks actual PostgreSQL and R2 connectivity. `GET /api/documents` reads persisted metadata. Other endpoints cover upload, selected-batch scan, debug steps, backup, reset and private PDF access.
+
+## Repository contents
+
+- `app/`, `components/`: Next.js pages and server endpoints.
+- `lib/`, `types/`: Prisma repository, R2 storage, OCR, AI and workflow logic.
+- `prisma/`: PostgreSQL schema and versioned migrations.
+- `tests/`: browser acceptance tests with synthetic fixtures.
+- `D1-FINAL/`: historical D1 documents and evidence; the earlier Vite/Django prototype remains recoverable in Git history at commit `0991162`.
+
+Environment files, API keys, generated Prisma code, dependencies and build artifacts are excluded from Git. The application is login-free as requested.

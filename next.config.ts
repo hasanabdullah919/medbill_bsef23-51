@@ -1,0 +1,12 @@
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  serverExternalPackages: ["pdf-parse", "tesseract.js", "@tesseract.js-data/eng", "@napi-rs/canvas"],
+  outputFileTracingIncludes: {
+    "/*": ["./certs/supabase-ca.crt"],
+    "/api/**": ["./certs/supabase-ca.crt", "./node_modules/tesseract.js/**/*", "./node_modules/tesseract.js-core/**/*", "./node_modules/@tesseract.js-data/eng/**/*"],
+  },
+  allowedDevOrigins: ["127.0.0.1"],
+};
+
+export default nextConfig;

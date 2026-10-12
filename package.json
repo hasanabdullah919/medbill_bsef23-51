@@ -1,0 +1,46 @@
+{
+  "name": "medbill",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:import": "tsx scripts/import-documents.ts",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "overrides": { "mysql2": "^3.24.5", "deepmerge-ts": "^8.0.2" },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.922.0",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "next": "^16.4.0",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.23.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tesseract.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^24.10.0",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "dotenv": "^18.0.7",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "^16.4.0",
+    "prisma": "^7.10.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
