@@ -2,43 +2,40 @@
 
 ## One minute explanation
 
-“MedBill is our medical billing project. For this D1 increment, we have implemented the document-verification workflow. A reviewer uploads a PDF or selects an existing file, runs the complete flow or controls each stage in debug mode, and sees where the original document ends up. The backend extracts existing text or performs OCR, checks claim fields, sends only text to AI, and routes the PDF into Accepted, Needs review, Rejected or Failed. We can inspect the report and download the original document. PostgreSQL stores metadata, while R2 stores PDFs and backups. The wider patient-to-payment billing modules remain future work, and we want to confirm that this increment is suitable for D1.”
+“MedBill is our medical billing project. For D1, we implemented the first complete claim-intake slice. A biller signs in, chooses manual entry or a synthetic claim PDF, reviews the patient, insurance and service fields, runs clear validation checks, saves the draft in PostgreSQL and opens a CMS-1500-style preview. PDF extraction is only an input shortcut; the biller must review every value. This D1 does not submit a claim to an insurer or include payments, denials or financial reporting.”
 
 ## Five minute demonstration
 
-1. Open https://medbill-steel.vercel.app/. Explain that this is a public synthetic-data demo with no login.
-2. Show the file picker inside Input. Select a custom batch; explain that unselected files stay untouched. Use the supplied `05_Demo_PDFs` files if you need to upload an example.
-3. Choose Complete flow and click the large Run button. Point to Read PDF, Get text, Validate fields, AI extraction and Move to output as progress changes.
-4. Inspect a result. Explain its actual folder and reason, expand the report, open the PDF and download the Markdown report.
-5. Select a pending PDF and choose Debug step-by-step. Run Read PDF and Get text, inspect the returned data, then continue through validation, AI and routing.
-6. Explain Workspace tools. Backup preserves a snapshot. Reset first backs up the run, clears output and returns all PDFs to input. It affects the shared live workspace, so do not invoke it casually during someone else's run.
-
-For a repeatable demonstration, prepare a backup and reset before the meeting only if you intend to restore the shared workspace. The source archive is the frozen D1 version; the live website can change later.
+1. Open https://medbill-steel.vercel.app and sign in as Biller with `biller@medbill.demo` and `D1Demo2026!`.
+2. Choose Enter manually, select Use demo data, add the service line and open the review screen.
+3. Click Validate and save draft. Explain that every check is visible and that validated means the D1 format checks passed.
+4. Generate the CMS-1500-style preview and show Print or Save PDF.
+5. Start another claim, upload `05_Demo_PDFs/BlueCross_Dermatology_Claim_1048.pdf`, review the extracted fields and complete the same validation and preview flow.
+6. If asked for technical evidence, sign in as Admin with `admin@medbill.demo`. The old PDF-routing experiment is under Technical evidence and is not the main D1 product.
 
 ## Explain the architecture simply
 
-- Next.js provides the interface and backend API in one application hosted on Vercel.
-- Prisma is the ORM that reads and writes PostgreSQL records. Supabase supplies PostgreSQL only.
-- R2 stores original PDF files in input, output categories and timestamped backups.
-- PDF text extraction and Tesseract OCR run in Node.js. OCR does not call Gemini or Ollama.
-- Gemini receives extracted text for structured explanation; Ollama Cloud is the fallback. Deterministic rules, not an AI guess, control the normal routing decision.
+- Next.js provides the interface and backend API on Vercel.
+- Signed sessions enforce Biller and Admin access.
+- Prisma stores Patient, Insurance, Claim and Document records in Supabase PostgreSQL.
+- R2 privately stores uploaded source PDFs.
+- PDF.js reads text PDFs and Tesseract.js handles scanned pages.
+- Both manual and PDF paths produce the same editable claim, validation result and preview.
 
 ## Questions you may get
 
-**Is Accepted an approved insurance claim?** No. It means this prototype's technical checks passed. We do not contact insurers or validate reimbursement eligibility.
+**Is this the complete MedBill product?** No. It is the D1 vertical slice from claim input to a stored, printable draft.
 
-**What do the rules check?** Readable text, member/policy ID, diagnosis-code format, procedure-code format, a positive amount, service date and provider information. They are presence/format checks, not authoritative clinical or code-set validation.
+**Does validated mean the insurer accepted the claim?** No. It means the required D1 presence and format checks passed.
 
-**What happens if OCR is uncertain?** Low-confidence OCR or failed OCR-derived checks require human review. Reported confidence is an engine estimate, not an accuracy score.
+**Is the CMS-1500 preview submitted anywhere?** No. It is a printable preview for D1. Payer submission and acknowledgements remain future work.
 
-**Did you train your own AI model?** No. Cloud text extraction works; a trained denial-risk model with a dataset, baseline and held-out evaluation remains planned.
+**Why allow PDF input?** Claim data may arrive in documents. Extraction reduces retyping, but the biller reviews and corrects every value before validation.
 
-**How do you know it works?** We tested the real Vercel endpoints, PostgreSQL and R2. Production tests covered upload, selection, routing, downloads, all debug stages and backup/reset. Forced OCR used zero AI calls. Physical R2 objects matched dashboard categories.
+**Did you train an AI model?** No. A measured denial-risk model with an approved dataset and held-out evaluation remains planned.
 
-**Why is there no login?** This increment was requested as a login-free demo. Authentication, roles and audit controls are required before using private patient data.
-
-**Is the whole original proposal complete?** No. Patients, charges, CMS-1500 creation, payment/denial posting and financial reports still need implementation. Show the report's scope/backlog rather than presenting them as done.
+**How do you know it works?** The database migration, lint and production build passed. Five browser tests passed locally and the same five passed against the live Vercel application.
 
 ## Ask for feedback
 
-“Does this PDF-verification slice meet your D1 expectation? Can we confirm the Next.js/PostgreSQL stack and agree on the next billing module and the evaluated AI objective?”
+“Does this D1 claim-intake, validation and preview slice meet the expected first deliverable? Which official claim export or submission requirement should we implement next?”
