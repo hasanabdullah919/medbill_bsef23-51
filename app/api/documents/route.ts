@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { authError, requireSession } from "@/lib/auth";
 import { config } from "@/lib/env";
 import { createDocument, listDocuments } from "@/lib/repository";
 import { putPdf, deleteStoredObject } from "@/lib/storage";
@@ -9,14 +10,16 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    await requireSession();
     return Response.json({ documents: await listDocuments() });
   } catch (error) {
-    return Response.json({ error: (error as Error).message }, { status: 500 });
+    return authError(error) || Response.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
+    await requireSession();
     const form = await request.formData();
     const file = form.get("file");
     if (!(file instanceof File)) return Response.json({ error: "Choose a PDF file" }, { status: 400 });
@@ -58,6 +61,6 @@ export async function POST(request: Request) {
     catch (error) { await deleteStoredObject(storageKey).catch(() => undefined); throw error; }
     return Response.json({ document: record }, { status: 201 });
   } catch (error) {
-    return Response.json({ error: (error as Error).message || "Upload failed" }, { status: 500 });
+    return authError(error) || Response.json({ error: (error as Error).message || "Upload failed" }, { status: 500 });
   }
 }

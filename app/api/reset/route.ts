@@ -1,3 +1,4 @@
+import { authError, requireSession } from "@/lib/auth";
 import { listDocuments, updateDocument } from "@/lib/repository";
 import { createStorageBackup, movePdf } from "@/lib/storage";
 
@@ -6,6 +7,7 @@ export const maxDuration = 300;
 
 export async function POST(request: Request) {
   try {
+    await requireSession();
     const body = await request.json();
     if (body?.confirmation !== "RESET") {
       return Response.json({ error: "Type RESET to confirm the workspace reset" }, { status: 400 });
@@ -31,6 +33,6 @@ export async function POST(request: Request) {
     }
     return Response.json({ backup, reset: resetDocuments.length, documents: resetDocuments });
   } catch (error) {
-    return Response.json({ error: (error as Error).message || "Reset failed" }, { status: 500 });
+    return authError(error) || Response.json({ error: (error as Error).message || "Reset failed" }, { status: 500 });
   }
 }

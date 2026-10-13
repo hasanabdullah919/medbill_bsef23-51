@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MedBill Document Router",
-  description: "Scan claim PDFs from an R2 input folder and route them into accepted, review, rejected, or failed output folders.",
+  title: "MedBill D1 Claim Workspace",
+  description: "Create a draft medical claim manually or from a PDF, validate its fields, and review a CMS-1500-style preview.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

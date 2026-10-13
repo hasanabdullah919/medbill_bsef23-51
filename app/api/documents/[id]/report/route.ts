@@ -1,9 +1,11 @@
+import { authError, requireSession } from "@/lib/auth";
 import { getDocument } from "@/lib/repository";
 
 export const runtime = "nodejs";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    await requireSession();
     const { id } = await params;
     const document = await getDocument(id);
     if (!document) return Response.json({ error: "Document not found" }, { status: 404 });
@@ -16,6 +18,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       "X-Content-Type-Options": "nosniff",
     } });
   } catch (error) {
-    return Response.json({ error: (error as Error).message }, { status: 500 });
+    return authError(error) || Response.json({ error: (error as Error).message }, { status: 500 });
   }
 }

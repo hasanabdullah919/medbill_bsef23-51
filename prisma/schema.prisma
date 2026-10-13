@@ -24,6 +24,7 @@ model Document {
   processedAt       DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  claims            Claim[]
 
   @@index([classification, createdAt])
 }
@@ -33,4 +34,64 @@ model DebugSession {
   data      Json
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model Patient {
+  id          String      @id @default(uuid()) @db.Uuid
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime?   @db.Date
+  gender      String?
+  address     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  insurances  Insurance[]
+  claims      Claim[]
+
+  @@index([lastName, firstName])
+}
+
+model Insurance {
+  id           String   @id @default(uuid()) @db.Uuid
+  patientId    String   @db.Uuid
+  providerName String
+  memberId     String
+  groupNumber  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  patient      Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  claims       Claim[]
+
+  @@index([patientId])
+  @@index([memberId])
+}
+
+model Claim {
+  id                String     @id @default(uuid()) @db.Uuid
+  claimNumber       String     @unique
+  patientId         String     @db.Uuid
+  insuranceId       String     @db.Uuid
+  sourceDocumentId  String?    @db.Uuid
+  source            String     @default("manual")
+  status            String     @default("draft")
+  providerName      String
+  providerNpi       String?
+  serviceDate       DateTime?  @db.Date
+  diagnosisCode     String
+  procedureCode     String
+  placeOfService    String?
+  chargeAmount      Decimal    @db.Decimal(12, 2)
+  clinicalNote      String?
+  validationReasons String[]   @default([])
+  createdBy         String
+  validatedAt       DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  patient           Patient    @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  insurance         Insurance  @relation(fields: [insuranceId], references: [id], onDelete: Restrict)
+  sourceDocument    Document?  @relation(fields: [sourceDocumentId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([patientId])
+  @@index([sourceDocumentId])
 }

@@ -1,13 +1,15 @@
+import { authError, requireSession } from "@/lib/auth";
 import { getDocument } from "@/lib/repository";
 import { getPdf } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const document = await getDocument(id);
-  if (!document) return Response.json({ error: "Document not found" }, { status: 404 });
   try {
+    await requireSession();
+    const { id } = await params;
+    const document = await getDocument(id);
+    if (!document) return Response.json({ error: "Document not found" }, { status: 404 });
     const bytes = await getPdf(document.storageKey);
     const name = document.name.replace(/["\\]/g, "_");
     return new Response(new Uint8Array(bytes), {
@@ -20,6 +22,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       },
     });
   } catch (error) {
-    return Response.json({ error: (error as Error).message }, { status: 500 });
+    return authError(error) || Response.json({ error: (error as Error).message }, { status: 500 });
   }
 }

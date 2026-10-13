@@ -1,3 +1,4 @@
+import { authError, requireSession } from "@/lib/auth";
 import { routeDocument } from "@/lib/pipeline";
 import { listDocuments } from "@/lib/repository";
 
@@ -5,6 +6,11 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 export async function POST(request: Request) {
+  try {
+    await requireSession();
+  } catch (error) {
+    return authError(error) || Response.json({ error: (error as Error).message }, { status: 500 });
+  }
   const documents = await listDocuments();
   const allQueued = documents.filter((document) =>
     document.status === "uploaded" || !document.classification || document.classification === "pending",
