@@ -7,14 +7,16 @@ import type { UserRole } from "@/types/claim";
 export function LoginForm() {
   const router = useRouter();
   const [role, setRole] = useState<UserRole>("biller");
-  const [email, setEmail] = useState("biller@medbill.demo");
-  const [password, setPassword] = useState("D1Demo2026!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
   function chooseRole(next: UserRole) {
     setRole(next);
-    setEmail(next === "admin" ? "admin@medbill.demo" : "biller@medbill.demo");
+    setEmail("");
+    setPassword("");
+    setError("");
   }
 
   async function submit(event: React.FormEvent) {
@@ -46,9 +48,9 @@ export function LoginForm() {
           <button type="button" aria-pressed={role === "biller"} onClick={() => chooseRole("biller")}>Biller</button>
           <button type="button" aria-pressed={role === "admin"} onClick={() => chooseRole("admin")}>Admin</button>
         </div>
-        <label>Email<input aria-label="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
-        <label>Password<input aria-label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
-        <div className="d1-demo-credentials"><strong>Demo credentials</strong><span>{email}</span><span>D1Demo2026!</span></div>
+        <label>Email<input aria-label="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={role === "admin" ? "admin@medbill.demo" : "biller@medbill.demo"} autoComplete="username" required /></label>
+        <label>Password<input aria-label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter the demo password" autoComplete="current-password" required /></label>
+        <div className="d1-demo-credentials"><strong>Demo credentials</strong><span>{role === "admin" ? "admin@medbill.demo" : "biller@medbill.demo"}</span><span>D1Demo2026!</span></div>
         {error && <div className="d1-alert error" role="alert">{error}</div>}
         <button className="d1-primary wide" disabled={busy}>{busy ? "Signing in…" : "Open D1 workspace"}</button>
       </form>

@@ -4,6 +4,8 @@ import path from "node:path";
 async function login(page: Page, role: "Biller" | "Admin" = "Biller") {
   await page.goto("/login");
   await page.getByRole("button", { name: role }).click();
+  await page.getByLabel("Email").fill(role === "Admin" ? "admin@medbill.demo" : "biller@medbill.demo");
+  await page.getByLabel("Password").fill("D1Demo2026!");
   await page.getByRole("button", { name: "Open D1 workspace" }).click();
   await expect(page.getByRole("heading", { name: "Create a claim from a form or a PDF." })).toBeVisible();
 }
@@ -50,6 +52,7 @@ test("PDF extraction populates an editable claim and completes the same flow", a
 
 test("invalid credentials are refused", async ({ page }) => {
   await page.goto("/login");
+  await page.getByLabel("Email").fill("biller@medbill.demo");
   await page.getByLabel("Password").fill("wrong-password");
   await page.getByRole("button", { name: "Open D1 workspace" }).click();
   await expect(page.locator(".d1-alert[role='alert']")).toContainText("Use the demo account");
