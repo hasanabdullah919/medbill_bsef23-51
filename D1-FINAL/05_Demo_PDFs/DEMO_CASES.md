@@ -1,16 +1,10 @@
 # Synthetic PDF demonstration cases
 
-These are the eight distinct PDF fixtures from the verified workspace. Use normal embedded-text extraction to demonstrate the expected outcomes below. OCR mistakes can deliberately downgrade a case to Needs review; the reviewer must check the original.
+Use these files only for the D1 demonstration. They contain synthetic data.
 
-| File | Scenario | Expected normal result |
-|---|---|---|
-| BlueCross_Dermatology_Claim_1048.pdf | Complete claim fields | Accepted |
-| Aetna_Physical_Therapy_Claim_2091.pdf | Different complete physical-therapy claim | Accepted |
-| UnitedHealth_Lab_Claim_Missing_Provider.pdf | Missing provider identity | Needs review |
-| Cigna_Radiology_Claim_Missing_Service_Date.pdf | Missing service date | Needs review |
-| Claim_Missing_Member_ID.pdf | Missing insurance/member identifier | Rejected |
-| Claim_Invalid_Diagnosis_And_Procedure.pdf | Invalid code formats | Rejected |
-| Zero_Value_Pharmacy_Claim.pdf | Non-positive amount | Rejected |
-| Encrypted_Provider_Statement.pdf | Protected PDF without its password | Failed |
+| File | Purpose |
+|---|---|
+| `BlueCross_Dermatology_Claim_1048.pdf` | Complete claim used to demonstrate PDF extraction, human review, validation and the CMS-1500-style preview. |
+| `Claim_Missing_Member_ID.pdf` | Invalid example used to show that a missing insurance member ID must be corrected before saving. |
 
-The protected file is intentionally unreadable without a password. Demonstrate its failure routing rather than trying to bypass its protection. These outcomes describe application rules, not real insurer decisions. No real patient information is included.
+The system performs D1 presence and format checks. It does not contact an insurer or decide whether a real claim will be paid.

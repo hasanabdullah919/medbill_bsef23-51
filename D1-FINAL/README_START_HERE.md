@@ -28,9 +28,9 @@ This D1 does not submit claims to payers, verify eligibility, post payments, man
 
 - `01_Submission`: final report in PDF and Word.
 - `02_Supervisor_Guide`: short explanation, demo steps and viva answers.
-- `03_Design_and_Evidence`: live D1 screenshot and production test record; older diagrams are retained as technical history.
+- `03_Design_and_Evidence`: live D1 screenshot and production test record.
 - `04_D1_Source`: frozen deployed source archive and version details.
-- `05_Demo_PDFs`: synthetic files for the PDF input demonstration.
+- `05_Demo_PDFs`: one valid and one invalid synthetic claim for the demonstration.
 - `06_Reference_Only`: the original proposal and university template.
 
 Use only synthetic data on the public deployment.

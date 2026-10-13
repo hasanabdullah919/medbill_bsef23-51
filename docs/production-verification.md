@@ -3,8 +3,8 @@
 Verified on 14 October 2026 (Asia/Karachi).
 
 - Application: https://medbill-steel.vercel.app
-- Runtime source commit: `de3e418`
-- Vercel production deployment: `dpl_JD4EnQXRBKWBn3kcnQY5UvmnUsMa`
+- Runtime source commit: `4350ab2`
+- Vercel production deployment: `dpl_99N9vS92hSvGEXg2S7noCZ8e1LC5`
 - Hosting: Vercel Hobby with Next.js frontend and Node.js Route Handlers.
 - Database: Supabase PostgreSQL through Prisma.
 - Files: private Cloudflare R2 bucket accessed only through authenticated backend endpoints.

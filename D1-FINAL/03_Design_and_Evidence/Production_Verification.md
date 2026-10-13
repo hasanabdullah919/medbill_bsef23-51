@@ -2,14 +2,14 @@
 
 Verified on 14 October 2026 against https://medbill-steel.vercel.app.
 
-- Runtime source commit: `de3e418`
-- Vercel deployment: `dpl_JD4EnQXRBKWBn3kcnQY5UvmnUsMa`
+- Runtime source commit: `4350ab2`
+- Vercel deployment: `dpl_99N9vS92hSvGEXg2S7noCZ8e1LC5`
 - Database migration: applied to Supabase PostgreSQL
 - Private PDF storage: Cloudflare R2
 
 ## Verified results
 
-1. Biller and Admin demo sign-in worked; invalid credentials were refused.
+1. Biller and Admin demo sign-in worked with manually entered credentials; invalid credentials were refused.
 2. Manual patient, insurance and claim entry saved a validated draft in PostgreSQL.
 3. PDF upload and extraction populated the same editable claim form.
 4. Human review, deterministic validation and CMS-1500-style preview worked for both input paths.
