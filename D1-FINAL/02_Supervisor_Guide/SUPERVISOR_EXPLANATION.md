@@ -11,7 +11,6 @@
 3. Click Validate and save draft. Explain that every check is visible and that validated means the D1 format checks passed.
 4. Generate the CMS-1500-style preview and show Print or Save PDF.
 5. Start another claim, upload `05_Demo_PDFs/BlueCross_Dermatology_Claim_1048.pdf`, review the extracted fields and complete the same validation and preview flow.
-6. If asked for technical evidence, sign in as Admin with `admin@medbill.demo`. The old PDF-routing experiment is under Technical evidence and is not the main D1 product.
 
 ## Explain the architecture simply
 

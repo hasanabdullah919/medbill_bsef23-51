@@ -14,7 +14,7 @@ Live application: [medbill-steel.vercel.app](https://medbill-steel.vercel.app). 
 - Required-field, code-format, date and amount validation with clear pass/fail results.
 - PostgreSQL persistence for patients, insurance records, claims and source documents.
 - CMS-1500-style printable claim preview.
-- Recent-claim history and an admin-only technical evidence workspace at `/technical`.
+- Recent-claim history and role-based access for the Biller and Admin demo roles.
 - Explicit labels for later work such as payer submission, ERA/EOB, payment posting and analytics.
 
 PDF extraction is an input convenience inside the proposed claim workflow. It does not auto-submit a claim and does not replace the user's review.
@@ -31,7 +31,7 @@ Use synthetic demonstration data only. Do not upload real patient information to
 
 The application uses Next.js App Router and React. Backend endpoints are Next.js Route Handlers running on Node.js. Prisma connects to Supabase PostgreSQL, and PDFs live in a private Cloudflare R2 bucket.
 
-OCR runs in Node.js with PDF.js/pdf-parse and Tesseract.js. Text-based PDFs skip OCR. The D1 claim validator is deterministic; the older Gemini/Ollama document-routing experiment is retained only in the admin technical workspace.
+OCR runs in Node.js with PDF.js/pdf-parse and Tesseract.js. Text-based PDFs skip OCR. The D1 claim validator uses deterministic presence and format checks, and the biller reviews every extracted value before saving.
 
 ## Run locally
 
@@ -49,7 +49,7 @@ Use Node 24 and open [http://localhost:3000](http://localhost:3000). Supabase's 
 
 Import the repository at its root, select Next.js and Node 24, copy the server-side values from `.env.example` into Vercel, apply Prisma migrations, and deploy. Set a long random `SESSION_SECRET` in production.
 
-Uploads are capped at 4 MB to fit Vercel's function request limit. R2 stores private source PDFs and technical-workspace outputs. All claim and document APIs except `/api/health` require a valid session.
+Uploads are capped at 4 MB to fit Vercel's function request limit. R2 stores private source PDFs. All claim and document APIs except `/api/health` require a valid session.
 
 ## Verify
 
@@ -59,9 +59,20 @@ npm run build
 npm test
 ```
 
-The browser suite covers authentication, manual claim validation and persistence, PDF extraction into the same editable workflow, CMS preview generation, invalid login and admin-only access.
+The browser suite covers authentication, manual claim validation and persistence, PDF extraction into the same editable workflow, CMS preview generation, invalid login and role-based access.
 
-`GET /api/health` checks PostgreSQL and R2 connectivity. Authenticated claim endpoints cover claim listing/creation and PDF extraction. The older document routing endpoints remain available only for signed-in technical evaluation.
+`GET /api/health` checks PostgreSQL and R2 connectivity. Authenticated claim endpoints cover claim listing, claim creation and PDF extraction.
+
+## Development workflow
+
+- `main` contains the stable, published application and aligned submission documents.
+- `testing` is the integration branch for changes that are not yet ready for release.
+- New backlog work uses `feature/<story-id>-<short-name>` branches.
+- Corrections use `fix/<issue-id>-<short-name>` branches.
+- Each branch is pushed to GitHub and reviewed through a pull request before merge.
+- Relevant lint, build and browser checks must pass before a change is released.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete branch and pull-request procedure.
 
 ## Repository contents
 
